@@ -1,0 +1,8 @@
+event=abs(ts_zscore(ts_delay(close,1)-open,20))>2;
+alpha=ts_delta(close,5)/ts_stddev(close,252);
+close_at_event = trade_when(event,close,-1);
+end=abs(close_at_event-close)/close_at_event>0.1;
+
+ts_stddev(close,20)>ts_stddev(close,90)?
+ts_decay_exp_window(trade_when(event,alpha,end),5):
+-rank(ts_delta(close,2))*(1-rank(ts_decay_linear(volume/sum(volume,30),10)))

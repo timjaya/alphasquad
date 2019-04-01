@@ -1,0 +1,9 @@
+# VWAP
+delay = ts_delay(close,2);
+regression = ts_regression(close,vwap,90,rettype=3);
+
+# SMA
+ma_60 = ts_sum(close,60)/60;
+
+ts_sum(sign(ts_delta(close,1)),4)==-4?
+rank(delay-regression):close>ma_60?1.6*rank(-ts_delta(close,2)):rank(-ts_delta(close,2))
