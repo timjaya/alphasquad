@@ -1,0 +1,1 @@
+close>ts_sum(close,20)/20?1.6*rank(-ts_delta(close,2)):rank(-ts_delta(close,2))

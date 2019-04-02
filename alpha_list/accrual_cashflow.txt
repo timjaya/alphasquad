@@ -1,0 +1,2 @@
+-delta(assets_curr - (liabilities_curr - debt_st), 60)
+

@@ -1,0 +1,2 @@
+ts_sum(sign(ts_delta(close,1)),4)==-4?0:rank(-ts_delta(close,2))
+

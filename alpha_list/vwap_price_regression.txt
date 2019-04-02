@@ -1,0 +1,1 @@
+rank(ts_delay(close,2)-ts_regression(close,vwap,60,rettype=3))

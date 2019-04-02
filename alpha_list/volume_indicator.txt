@@ -1,0 +1,1 @@
+volume>adv20?2*rank(-ts_delta(close,2)):rank(-ts_delta(close,2))

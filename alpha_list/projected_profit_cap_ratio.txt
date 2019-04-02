@@ -1,0 +1,2 @@
+Group_rank(est_netprofit/cap, subindustry)
+

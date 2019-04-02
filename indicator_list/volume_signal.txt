@@ -1,0 +1,1 @@
+rank(trade_when(volume>adv20,a,-1))
