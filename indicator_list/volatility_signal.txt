@@ -1,1 +1,1 @@
-ts_stddev(close,90)>ts_stddev(close,90)?a:b
+ts_stddev(close,20)>ts_stddev(close,90)?a:b

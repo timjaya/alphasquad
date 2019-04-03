@@ -22,17 +22,36 @@ for (i in 1:(length(alpha_list)-1)){
   for (j in 2:length(alpha_list)){
     alpha_1 <- paste0(parent_dir, "/alpha_list/", alpha_list[i])
     alpha_2 <- paste0(parent_dir, "/alpha_list/", alpha_list[j])
+    
     alpha_1_code <- trimws(readChar(alpha_1, 
                              file.info(alpha_1)$size), "both")
     alpha_1_code_final <- paste0("a=", alpha_1_code, ";")
+    
     alpha_2_code <- trimws(readChar(alpha_2, 
                              file.info(alpha_2)$size), "both")
     alpha_2_code_final <- paste0("b=", alpha_2_code, ";")
+    
     my_alpha_final <- paste0(alpha_1_code_final, alpha_2_code_final, volatility_signal_code)
+    
     dt.alpha_list <- rbind(dt.alpha_list,
                            data.table(id=id,
                                       code=my_alpha_final))
-    id <- id + 1
+    
+    alpha_3_code <- trimws(readChar(alpha_1, 
+                                    file.info(alpha_1)$size), "both")
+    alpha_3_code_final <- paste0("b=", alpha_3_code, ";")
+    
+    alpha_4_code <- trimws(readChar(alpha_2, 
+                                    file.info(alpha_2)$size), "both")
+    alpha_4_code_final <- paste0("a=", alpha_2_code, ";")
+    
+    my_alpha_final_2 <- paste0(alpha_3_code_final, alpha_4_code_final, volatility_signal_code)
+    
+    dt.alpha_list <- rbind(dt.alpha_list,
+                           data.table(id=id+1,
+                                      code=my_alpha_final_2))
+    
+    id <- id + 2
   }
 }
 
