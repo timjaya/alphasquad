@@ -1,1 +1,1 @@
-tim, jeff, nico, kyle
+tim, jeff, nico, kyle, patrick
