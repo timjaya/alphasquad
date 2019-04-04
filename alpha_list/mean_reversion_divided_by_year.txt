@@ -1,2 +1,1 @@
-rank(ts_sum((open>close)*(open-close)/(high-low),20)/ts_sum((open<close)*(-(open-close)/(high-low)),20)/
-ts_sum((open>close)*(open-close)/(high-low),252)/ts_sum((open<close)*(-(open-close)/(high-low)),252))
+rank(ts_sum((open>close)*(open-close)/(high-low),20)/ts_sum((open<close)*(-(open-close)/(high-low)),20)/ts_sum((open>close)*(open-close)/(high-low),252)/ts_sum((open<close)*(-(open-close)/(high-low)),252))

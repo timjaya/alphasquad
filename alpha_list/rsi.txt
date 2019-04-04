@@ -1,1 +1,1 @@
-- (100 - 100 / (1 + sum((delta(close,1) > 0 ? delta(close,1) : 0), 10) / sum((delta(close,1) < 0 ? - delta(close,1) : 0), 10)))
+-(100 - 100 / (1 + sum((delta(close,1) > 0 ? delta(close,1) : 0), 10) / sum((delta(close,1) < 0 ? - delta(close,1) : 0), 10)))
