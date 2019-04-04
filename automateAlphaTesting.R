@@ -25,6 +25,7 @@ for (i in alpha_list){
   file_name <- paste0(dir_path, "/", i)
   my_code <- trimws(readChar(file_name, 
                              file.info(file_name)$size), "both")
+  # check if there is an en dash in our code, if so replace it with a normal dash
   
   # Check to make sure text edit is blank
   remDr$findElement(using = "xpath", 
@@ -44,7 +45,7 @@ for (i in alpha_list){
   # document.querySelector(".editor-simulate-button").firstElementChild.click()
   remDr$executeScript(script = 'document.querySelector(".editor-simulate-button").firstElementChild.click()')
   
-  Sys.sleep(5)
+  Sys.sleep(10)
   
   # Get pass fail status
   run_status <- NULL
@@ -77,22 +78,25 @@ for (i in alpha_list){
   
   # JQuery to run correlation
   # document.getElementsByClassName("correlation__content-status-time-refresh")[0].click()
-  remDr$executeScript(script = 'document.getElementsByClassName("correlation__content-status-time-refresh")[0].click()')
-  
-  correlation_value <- NULL
-  while (is.null(correlation_value) || is.na(correlation_value)){
-    correlation_value <- tryCatch({
-      # JQuery to grab correlation value
-      # document.getElementsByClassName("correlation__content-status-higher-value")[0].textContent
-      value <- as.numeric(remDr$findElement(using = "xpath",
-                                                        value = '//*[@id="alphas-correlation"]/div[2]/div/div[1]/div[2]/div[2]')$getElementText()[[1]])
-    },
-    error = function(e){
-      
-    }
-    )
-    Sys.sleep(2)
-  }
+  # remDr$executeScript(script = 'document.getElementsByClassName("correlation__content-status-time-refresh")[0].click()')
+  # Sys.sleep(5)
+  # correlation_value <- as.numeric(remDr$findElement(using = "xpath",
+  #                                                   value = '//*[@id="alphas-correlation"]/div[2]/div/div[1]/div[2]/div[2]')$getElementText()[[1]])
+  # 
+  # while (is.null(correlation_value) || is.na(correlation_value)){
+  #   correlation_value <- tryCatch({
+  #     # JQuery to grab correlation value
+  #     # document.getElementsByClassName("correlation__content-status-higher-value")[0].textContent
+  #     value <- as.numeric(remDr$findElement(using = "xpath",
+  #                                                       value = '//*[@id="alphas-correlation"]/div[2]/div/div[1]/div[2]/div[2]')$getElementText()[[1]])
+  #   },
+  #   error = function(e){
+  #     
+  #   }
+  #   )
+  #   Sys.sleep(900)
+  # }
+  correlation_value <- NA
   
   # JQuery to run IQC Performance Comparison
   # document.getElementsByClassName("correlation__content-status-time-refresh")[1].click()
@@ -128,6 +132,8 @@ for (i in alpha_list){
   
   Sys.sleep(runif(1, 1.0, 5))
 }
+
+write.csv(dt.results, "results.csv")
 
 # remDr$closeall()
 # rm(driver)
