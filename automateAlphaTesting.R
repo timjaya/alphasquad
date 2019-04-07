@@ -129,11 +129,11 @@ for (i in alpha_list){
   dt.results <- rbind(dt.results, dt.insert.this)
   
   print(dt.insert.this)
+  # Write insert this to result folder
+  write.csv(dt.insert.this, paste0(parent_dir, "/results_combinations/", unlist(strsplit(i, "\\."))[1], ".csv"))
   
   Sys.sleep(runif(1, 1.0, 5))
 }
-
-write.csv(dt.results, "results.csv")
 
 remDr$closeall()
 rm(driver)
