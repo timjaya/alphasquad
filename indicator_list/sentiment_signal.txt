@@ -1,0 +1,1 @@
+snt_value>0?a:b

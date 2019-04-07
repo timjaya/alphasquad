@@ -135,7 +135,7 @@ for (i in alpha_list){
 
 write.csv(dt.results, "results.csv")
 
-# remDr$closeall()
-# rm(driver)
-# gc()
+remDr$closeall()
+rm(driver)
+gc()
 
