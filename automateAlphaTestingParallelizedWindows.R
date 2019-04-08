@@ -26,7 +26,7 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 parent_dir <- getwd()
 dir_path <- paste0(parent_dir, "/test_combinations")
 alpha_list <- list.files(dir_path)
-
+alpha_list <- alpha_list[752:789]
 # When you fix clusterapply use this chunk of code
 # alpha_split_list <- split(alpha_list, 1:3)
 # sub_list <- alpha_list[x]
