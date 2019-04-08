@@ -1,0 +1,3 @@
+ema_slow = ts_decay_exp_window(close, 26, factor = 2);
+ema_fast = ts_decay_exp_window(close, 12, factor = 2);
+ema_slow>ema_fast?a:b
