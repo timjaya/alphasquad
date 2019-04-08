@@ -1,7 +1,6 @@
 library(RSelenium)
 library(rvest)
 library(data.table)
-library(snow)
 
 # Note: User login is not automated yet so I cannot parallelized this process neatly
 # Have to login 3 times separately which creates massive redundancy
