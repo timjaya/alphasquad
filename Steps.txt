@@ -1,0 +1,5 @@
+1. Define your alpha model in alpha_models.R following the format
+2a. If you want to do a grid search, run tuneParameters and follow the format at the bottom of the file
+2b. If you want to do strategy combination, run generateAlpha.R
+3. Make sure the combinations you want to test are in the test_combinations folder
+4. Run automateAlphaTestingParallelizedWindows.R and follow the instructions in the R file
