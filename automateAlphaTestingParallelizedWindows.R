@@ -132,7 +132,16 @@ for (ind in 1:ceiling(length(alpha_list)/3)){
     if (ind2 == 1){
       for (ind3 in 1:length(vec_alpha)){
         remDrTemp <- remDrList[[ind3]]
-        remDrTemp$executeScript(script = 'document.getElementsByClassName("correlation__content-status-time-refresh")[1].click()')
+        iqc_run_status <- NULL
+        while (is.null(iqc_run_status)){
+          iqc_run_status <- tryCatch({
+            iqc_run_status <- remDrTemp$executeScript(script = 'document.getElementsByClassName("correlation__content-status-time-refresh")[1].click()')
+          },
+          error = function(e){
+          }
+          )
+          Sys.sleep(2)
+        }
       }
     }
     
@@ -178,4 +187,4 @@ remDr3$closeall()
 rm(driver1)
 rm(driver2)
 rm(driver3)
-
+gc()
