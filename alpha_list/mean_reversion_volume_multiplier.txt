@@ -1,1 +1,0 @@
--rank(ts_delta(close,2))*(1-rank(ts_decay_linear(volume/sum(volume,30),10)))
