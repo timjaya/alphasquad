@@ -25,11 +25,8 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 parent_dir <- getwd()
 dir_path <- paste0(parent_dir, "/test_combinations")
 alpha_list <- list.files(dir_path)
-# When you fix clusterapply use this chunk of code
-# alpha_split_list <- split(alpha_list, 1:3)
-# sub_list <- alpha_list[x]
-# remDrList <- c(remDr1, remDr2, remDr3)
-# remDr <- remDrList[[x]]
+# alpha_list <- alpha_list[530:1752]
+
 remDrList <- c(remDr1, remDr2, remDr3)
 
 for (ind in 1:ceiling(length(alpha_list)/3)){
@@ -45,7 +42,17 @@ for (ind in 1:ceiling(length(alpha_list)/3)){
       file_name <- paste0(dir_path, "/", i)
       my_code <- trimws(readChar(file_name,
                                  file.info(file_name)$size), "both")
+      
       # Check to make sure text edit is blank
+      # Press tab three times in case cursor is not on editor
+      remDr$findElement(using = "xpath",
+                        value = '//*[@id="root"]/div/div[2]/div/div[3]/div[2]/div/div[1]/div/div/div/div[1]/div/div[1]/div[2]')$sendKeysToActiveElement(sendKeys = list(key = "tab"))
+      remDr$findElement(using = "xpath",
+                        value = '//*[@id="root"]/div/div[2]/div/div[3]/div[2]/div/div[1]/div/div/div/div[1]/div/div[1]/div[2]')$sendKeysToActiveElement(sendKeys = list(key = "tab"))
+      remDr$findElement(using = "xpath",
+                        value = '//*[@id="root"]/div/div[2]/div/div[3]/div[2]/div/div[1]/div/div/div/div[1]/div/div[1]/div[2]')$sendKeysToActiveElement(sendKeys = list(key = "tab"))
+
+      # Clear text editor
       remDr$findElement(using = "xpath", 
                         value = '//*[@id="root"]/div/div[2]/div/div[3]/div[2]/div/div[1]/div/div/div/div[1]/div/div[1]/div[2]')$sendKeysToActiveElement(sendKeys = list(key = "control", "a"))
       remDr$findElement(using = "xpath", 
@@ -75,12 +82,16 @@ for (ind in 1:ceiling(length(alpha_list)/3)){
       
       # Get pass fail status
       run_status <- NULL
-      # Use run count to keep track of how many runs it's been so far after 450 runs, we kill it and restart the loop 
+      # Use run count to keep track of how many runs it's been so far after 180 runs, we kill it and restart the loop 
       run_count <- 0
       print("Grabbing run status")
       while (is.null(run_status)){
         run_status <- tryCatch({
-          if (run_count > 450){
+          if (run_count > 180){
+            # Click on cancel button
+            remDr$findElement(using = "xpath", 
+                              value = '//*[@id="root"]/div/div[2]/div/div[3]/div[2]/div/div[2]/div/div/div/div/div[2]')$click()
+            Sys.sleep(5)
             break
           }
           run_count <- run_count + 1
@@ -94,7 +105,7 @@ for (ind in 1:ceiling(length(alpha_list)/3)){
         )
         Sys.sleep(2)
       }
-      if (run_count > 450){
+      if (run_count > 180){
         break
       }
       
