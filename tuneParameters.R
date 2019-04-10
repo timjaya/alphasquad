@@ -6,17 +6,7 @@ parent_dir <- getwd()
 
 source(paste0(parent_dir, "/alpha_models.R"))
 
-assignVec <- function (x, value, pos = -1, envir = as.environment(pos), inherits = FALSE, 
-                       immediate = TRUE) 
-{
-  args <- lapply(as.list(match.call())[-1L], eval, parent.frame())
-  names <- if (is.null(names(args))) 
-    character(length(args))
-  else names(args)
-  dovec <- names %in% vectorize.args
-  do.call("mapply", c(FUN = FUN, args[dovec], MoreArgs = list(args[!dovec]), 
-                      SIMPLIFY = SIMPLIFY, USE.NAMES = USE.NAMES))
-}
+assignVec <- Vectorize("assign",c("x","value"))
 
 funcGridSearch <- function(alpha_name, my_alpha_model, param_grid){
   # my_alpha_model is an alpha model ins alpha_models.R 
