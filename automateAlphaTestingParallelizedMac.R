@@ -7,9 +7,9 @@ library(data.table)
 
 url = "https://websim.worldquantvrc.com/simulate"
 
-driver1 <- rsDriver(browser=c("chrome"), port = 4444L, chromever="73.0.3683.68")
-driver2 <- rsDriver(browser=c("chrome"), port = 4445L, chromever="73.0.3683.68")
-driver3 <- rsDriver(browser=c("chrome"), port = 4446L, chromever="73.0.3683.68")
+driver1 <- rsDriver(browser=c("chrome"), port = 4444L, chromever="73.0.3683.68",platform='Linux')
+driver2 <- rsDriver(browser=c("chrome"), port = 4445L, chromever="73.0.3683.68",platform='Linux')
+driver3 <- rsDriver(browser=c("chrome"), port = 4446L, chromever="73.0.3683.68",platform='Linux')
 
 remDr1 <- driver1[["client"]]
 remDr1$navigate(url)
@@ -54,11 +54,11 @@ for (ind in 1:ceiling(length(alpha_list)/3)){
       
       # Clear text editor
       remDr$findElement(using = "xpath", 
-                        value = '//*[@id="root"]/div/div[2]/div/div[3]/div[2]/div/div[1]/div/div/div/div[1]/div/div[1]/div[2]')$sendKeysToActiveElement(sendKeys = list(key = "command", "a"))
+                        value = '//*[@id="root"]/div/div[2]/div/div[3]/div[2]/div/div[1]/div/div/div/div[1]/div/div[1]/div[2]')$sendKeysToActiveElement(sendKeys = list(key = "command_meta","a"))
       remDr$findElement(using = "xpath", 
                         value = '//*[@id="root"]/div/div[2]/div/div[3]/div[2]/div/div[1]/div/div/div/div[1]/div/div[1]/div[2]')$sendKeysToActiveElement(sendKeys = list(key = "backspace"))
       remDr$findElement(using = "xpath", 
-                        value = '//*[@id="root"]/div/div[2]/div/div[3]/div[2]/div/div[1]/div/div/div/div[1]/div/div[1]/div[2]')$sendKeysToActiveElement(sendKeys = list(key = "command", "a"))
+                        value = '//*[@id="root"]/div/div[2]/div/div[3]/div[2]/div/div[1]/div/div/div/div[1]/div/div[1]/div[2]')$sendKeysToActiveElement(sendKeys = list(key = "command_meta", "a"))
       remDr$findElement(using = "xpath", 
                         value = '//*[@id="root"]/div/div[2]/div/div[3]/div[2]/div/div[1]/div/div/div/div[1]/div/div[1]/div[2]')$sendKeysToActiveElement(sendKeys = list(key = "backspace"))
       
