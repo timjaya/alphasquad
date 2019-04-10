@@ -6,6 +6,18 @@ parent_dir <- getwd()
 
 source(paste0(parent_dir, "/alpha_models.R"))
 
+assignVec <- function (x, value, pos = -1, envir = as.environment(pos), inherits = FALSE, 
+                       immediate = TRUE) 
+{
+  args <- lapply(as.list(match.call())[-1L], eval, parent.frame())
+  names <- if (is.null(names(args))) 
+    character(length(args))
+  else names(args)
+  dovec <- names %in% vectorize.args
+  do.call("mapply", c(FUN = FUN, args[dovec], MoreArgs = list(args[!dovec]), 
+                      SIMPLIFY = SIMPLIFY, USE.NAMES = USE.NAMES))
+}
+
 funcGridSearch <- function(alpha_name, my_alpha_model, param_grid){
   # my_alpha_model is an alpha model ins alpha_models.R 
   # param_grid is a data table of parameters we want to expand grid: parameter, value
@@ -75,23 +87,23 @@ dt.param_grid_monthly_mean_reversion <- data.table(parameter = rep(c("lookback_1
                                                              seq(from = 52, to = 252, by = 20)))
 
 dt.alpha_monthly_mean_reversion <- funcGridSearch(my_alpha_model = monthly_mean_reversion,
-                                                          alpha_name = "monthly_mean_reversion",
-                                                          param_grid = dt.param_grid_monthly_mean_reversion)
+                                                  alpha_name = "monthly_mean_reversion",
+                                                  param_grid = dt.param_grid_monthly_mean_reversion)
 funcOutputCode(dt.alpha_monthly_mean_reversion)
 
 ############################################### morning_gap_trend_following ###############################################
 # default val lookback_1=20, lookback_2=252, decay = 5, z_score_threshold=3.5, pct_change_threshold=0.1
 dt.param_grid_morning_gap_trend_following <- data.table(parameter = rep(c("lookback_1","lookback_2", "decay", 
                                                                           "z_score_threshold", "pct_change_threshold"), each = 3),
-                                                   value = c(seq(from = 10, to = 30, by = 10),
-                                                             seq(from = 52, to = 252, by = 100),
-                                                             seq(from = 4, to = 6, by = 1),
-                                                             seq(from = 2.5, to = 4.5, by = 1),
-                                                             seq(from = 0.05, to = 0.15, by = 0.05)))
+                                                        value = c(seq(from = 10, to = 30, by = 10),
+                                                                  seq(from = 52, to = 252, by = 100),
+                                                                  seq(from = 4, to = 6, by = 1),
+                                                                  seq(from = 2.5, to = 4.5, by = 1),
+                                                                  seq(from = 0.05, to = 0.15, by = 0.05)))
 
 dt.alpha_morning_gap_trend_following <- funcGridSearch(my_alpha_model = morning_gap_trend_following,
-                                                  alpha_name = "morning_gap_trend_following",
-                                                  param_grid = dt.param_grid_morning_gap_trend_following)
+                                                       alpha_name = "morning_gap_trend_following",
+                                                       param_grid = dt.param_grid_morning_gap_trend_following)
 funcOutputCode(dt.alpha_morning_gap_trend_following)
 
 ############################################### price_signal_stop_loss ###############################################
@@ -106,24 +118,24 @@ funcOutputCode(dt.alpha_price_signal_stop_loss)
 
 ############################################### rev_growth ###############################################
 dt.param_grid_rev_growth <- data.table(parameter = rep(c("lookback"), each = 11),
-                                             value = seq(from = 52, to = 252, by = 20))
+                                       value = seq(from = 52, to = 252, by = 20))
 dt.alpha_param_rev_growth <- funcGridSearch(my_alpha_model = rev_growth,
-                                              alpha_name = "rev_growth",
-                                              param_grid = dt.param_grid_rev_growth)
+                                            alpha_name = "rev_growth",
+                                            param_grid = dt.param_grid_rev_growth)
 funcOutputCode(dt.alpha_param_rev_growth)
 
 ############################################### rsi ###############################################
 dt.param_grid_rsi <- data.table(parameter = rep(c("lookback"), each = 11),
-                                       value = seq(from = 5, to = 15, by = 1))
+                                value = seq(from = 5, to = 15, by = 1))
 dt.alpha_param_rsi <- funcGridSearch(my_alpha_model = rsi,
-                                            alpha_name = "rsi",
-                                            param_grid = dt.param_grid_rsi)
+                                     alpha_name = "rsi",
+                                     param_grid = dt.param_grid_rsi)
 funcOutputCode(dt.alpha_param_rsi)
 
 ############################################### sma_20 ###############################################
 dt.param_grid_sma_20 <- data.table(parameter = rep(c("weighting","lookback"), each = 11),
-                                                   value = c(seq(from = 1.1, to = 2.1, by = 0.1),
-                                                             seq(from = 10, to = 60, by = 5)))
+                                   value = c(seq(from = 1.1, to = 2.1, by = 0.1),
+                                             seq(from = 10, to = 60, by = 5)))
 
 dt.alpha_sma_20 <- funcGridSearch(my_alpha_model = sma_20,
                                   alpha_name = "sma_20",
