@@ -277,3 +277,44 @@ funcActualEstimateRatioSum <- function(){
     writeChar(dt.temp$code, paste0(parent_dir, "/test_combinations/", dt.temp$file, ".txt"), nchars = nchar(dt.temp$code))
   }
 }
+
+funcRatioThreeVarSumGeneration <- function(){
+  setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+  parent_dir <- getwd()
+  dir_path <- paste0(parent_dir, "/results_combinations/fundamental_estimate_actual_ratio")
+  result_list <- list.files(dir_path)
+  
+  dt.results <- rbindlist(lapply(result_list, function(x) fread(paste0(dir_path, "/", x))))
+  dt.results[,V1 := NULL]
+  dt.results[,score_delta := as.numeric(score_delta)]
+  dt.results[,sharpe_ratio := as.numeric(sharpe_ratio)]
+  dt.results <- dt.results[status != "ERROR"]
+  dt.candidates <- dt.results[sharpe_ratio > 0.7]
+  dt.write.this <- data.table()
+  
+  for (i in 1:(nrow(dt.candidates) - 2)){
+    for (j in (i+1):(nrow(dt.candidates)-1)){
+      for (k in (j+1):(nrow(dt.candidates))){
+        my_file_a <- paste0(parent_dir, "/test_combinations/fundamental_estimate_actual_ratio/", dt.candidates[i]$alpha_id)
+        my_code_a <- trimws(readChar(my_file_a, 
+                                     file.info(my_file_a)$size), "both")
+        my_file_b <- paste0(parent_dir, "/test_combinations/fundamental_estimate_actual_ratio/", dt.candidates[j]$alpha_id)
+        my_code_b <- trimws(readChar(my_file_b, 
+                                     file.info(my_file_b)$size), "both")
+        my_file_c <- paste0(parent_dir, "/test_combinations/fundamental_estimate_actual_ratio/", dt.candidates[k]$alpha_id)
+        my_code_c <- trimws(readChar(my_file_c, 
+                                     file.info(my_file_c)$size), "both")
+        
+        dt.write.this <- rbind(dt.write.this,
+                               data.table(code = paste0(my_code_a, "+", my_code_b, "+", my_code_c)))
+      }
+    }
+  }
+  dt.write.this[,id := 1:nrow(dt.write.this)]
+  dt.write.this[,file_name := paste0("alpha_", id)]
+  
+  for (i in 1:nrow(dt.write.this)){
+    dt.temp <- dt.write.this[id == i]
+    writeChar(dt.temp$code, paste0(parent_dir, "/test_combinations/alpha_", i, ".txt"), nchars = nchar(dt.temp$code))
+  }
+}

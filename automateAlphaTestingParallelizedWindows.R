@@ -254,8 +254,15 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
           for (ind3 in 1:length(vec_alpha)){
             remDrTemp <- remDrList[[ind3]]
             
-            testing_status <- remDrTemp$findElement(using = "xpath",
-                                                    value = '//*[@id="alphas-testingStatus"]/div/div[1]/div')$getElementText()[[1]]
+            testing_status <- NULL
+            while (is.null(testing_status)){
+              testing_status <- tryCatch({
+                remDr$findElement(using = "xpath",
+                                  value = '//*[@id="alphas-testingStatus"]/div/div[1]/div')$getElementText()[[1]]
+              }, error = function(e){
+                Sys.sleep(1)
+              })
+            }
             
             # We already tested this alpha
             if (testing_status == "OS Testing Status"){

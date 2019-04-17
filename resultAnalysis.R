@@ -4,7 +4,7 @@ library(plotly)
 
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 parent_dir <- getwd()
-dir_path <- paste0(parent_dir, "/results_combinations/")
+dir_path <- paste0(parent_dir, "/results_combinations/fundamental_estimate_actual_ratio")
 result_list <- setdiff(list.files(dir_path),list.dirs(dir_path,recursive=F, full.names = F))
 
 
