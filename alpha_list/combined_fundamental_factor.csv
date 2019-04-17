@@ -1,0 +1,16 @@
+actual_value,estimated_value
+bookvalue_ps,est_bookvalue_ps
+capex,est_capex
+cashflow_fin,est_cashflow_fin
+cashflow_invst,est_cashflow_invst
+cashflow_op,est_cashflow_op
+EBIT,est_ebit
+EBITDA,est_ebitda
+eps,est_eps
+rd_expense,est_rd_expense
+sales,est_sales
+SGA_expense,est_sga
+assets,est_tot_assets
+goodwill,est_tot_goodwill
+eps,etz_eps
+revenue,etz_revenue
