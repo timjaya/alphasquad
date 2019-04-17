@@ -28,6 +28,13 @@ authenticate <- function(driver, username, password) {
   driver$findElement(using = "xpath", value = password_path)$sendKeysToActiveElement(sendKeys = list(password))
   driver$executeScript(script = 'document.querySelector(".button--lg").firstElementChild.click()')
   
+  Sys.sleep(5)
+  tryCatch({
+    # Click on new tab to avoid no tab error
+    driver$executeScript(script = 'document.querySelector(".editor-tabs__new-tab-dropdown-element").click()')
+  }, error=function(e){})
+  
+  
   # to deal with skip button
   skip_status <- NULL
   while (is.null(skip_status)){
