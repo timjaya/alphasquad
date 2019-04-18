@@ -174,6 +174,7 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
           })
         }
         
+        print(testing_status)
         # We already tested this alpha
         if (testing_status == "OS Testing Status"){
           next
@@ -206,6 +207,14 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
             pass_fail <- remDr$findElement(using = "xpath",
                                            value = '//*[@id="alphas-testingStatus"]/div/div[2]/div/div/div[1]')$getElementText()[[1]]
             pass_fail_status <- unlist(strsplit(pass_fail, " "))[2]
+            pass_fail2 <- remDr$findElement(using = "xpath",
+                                           value = '//*[@id="alphas-testingStatus"]/div/div[2]/div/div/div[2]')$getElementText()[[1]]
+            pass_fail_status2 <- unlist(strsplit(pass_fail2, " "))[2]
+            if (pass_fail == "FAIL" | pass_fail == "FAIL"){
+              "FAIL"
+            } else{
+              "PASS"
+            }
           },
           error = function(e){
             
@@ -266,7 +275,7 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
             testing_status <- NULL
             while (is.null(testing_status)){
               testing_status <- tryCatch({
-                remDr$findElement(using = "xpath",
+                remDrTemp$findElement(using = "xpath",
                                   value = '//*[@id="alphas-testingStatus"]/div/div[1]/div')$getElementText()[[1]]
               }, error = function(e){
                 Sys.sleep(1)
@@ -274,6 +283,7 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
             }
             
             # We already tested this alpha
+            print(testing_status)
             if (testing_status == "OS Testing Status"){
               next
             }
@@ -342,4 +352,4 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
 }
 
 # Offset defines how many files you want to skip
-funcRun(offset = 841)
+funcRun(offset = 0)
