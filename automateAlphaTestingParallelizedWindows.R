@@ -157,11 +157,19 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
                                    file.info(file_name)$size), "both")
         
         testing_status <- NULL
+        testing_count <- 0
         while (is.null(testing_status)){
           testing_status <- tryCatch({
             remDr$findElement(using = "xpath",
                               value = '//*[@id="alphas-testingStatus"]/div/div[1]/div')$getElementText()[[1]]
           }, error = function(e){
+            testing_count <- testing_count + 1
+            print(paste0("Testing count: ", testing_count))
+            if (testing_count > 180){
+              # If it failed too many times then let's try to restart the simulation
+              remDr$executeScript(script = 'document.querySelector(".editor-simulate-button").firstElementChild.click()')
+              testing_count <- 0
+            }
             Sys.sleep(1)
           })
         }
@@ -178,6 +186,7 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
         print("Grabbing run status")
         while (is.null(run_status)){
           run_status <- tryCatch({
+            print(paste0("Run count: ", run_count))
             if (run_count > 180){
               # Click on cancel button
               # If cancel button doesn't exist, then restart simulation
@@ -333,5 +342,4 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
 }
 
 # Offset defines how many files you want to skip
-funcRun(offset = 0)
-
+funcRun(offset = 841)

@@ -4,7 +4,7 @@ library(plotly)
 
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 parent_dir <- getwd()
-dir_path <- paste0(parent_dir, "/results_combinations/fundamental_estimate_actual_ratio")
+dir_path <- paste0(parent_dir, "/results_combinations/")
 result_list <- setdiff(list.files(dir_path),list.dirs(dir_path,recursive=F, full.names = F))
 
 
@@ -16,6 +16,7 @@ dt.results[,score_delta := as.numeric(score_delta)]
 dt.results[,sharpe_ratio := as.numeric(sharpe_ratio)]
 dt.results <- dt.results[status != "ERROR"]
 dt.results[,strategy := paste(head(unlist(strsplit(alpha_id, "\\_")), -1), collapse = "_"), by = 1:nrow(dt.results)]
+dt.results[sharpe_ratio < 1.25, status := "FAIL"]
 my_plot <- ggplot(dt.results, aes(x = sharpe_ratio, score_delta, text = paste0("alpha_id: ", alpha_id,
                                                                                "\nturn_over: ", turn_over,
                                                                                "\nfitness: ", fitness,
