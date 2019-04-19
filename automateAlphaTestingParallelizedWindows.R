@@ -210,7 +210,7 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
             pass_fail2 <- remDr$findElement(using = "xpath",
                                            value = '//*[@id="alphas-testingStatus"]/div/div[2]/div/div/div[2]')$getElementText()[[1]]
             pass_fail_status2 <- unlist(strsplit(pass_fail2, " "))[2]
-            if (pass_fail == "FAIL" | pass_fail == "FAIL"){
+            if (pass_fail_status == "FAIL" | pass_fail_status2 == "FAIL"){
               "FAIL"
             } else{
               "PASS"
