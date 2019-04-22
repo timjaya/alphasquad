@@ -14,7 +14,7 @@ url = "https://websim.worldquantvrc.com/simulate"
 
 # for authentication
 # make sure to set environment variables through console e.g. execute
-# Sys.setenv("USERNAME"= "insert", "PASSWORD"= "insert")
+# Sys.setenv("USERNAME"= "", "PASSWORD"= "")
 
 username = Sys.getenv("USERNAME")
 password = Sys.getenv("PASSWORD")
@@ -159,12 +159,12 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
         testing_status <- NULL
         testing_count <- 0
         while (is.null(testing_status)){
+          testing_count <- testing_count + 1
           testing_status <- tryCatch({
             remDr$findElement(using = "xpath",
                               value = '//*[@id="alphas-testingStatus"]/div/div[1]/div')$getElementText()[[1]]
           }, error = function(e){
-            testing_count <- testing_count + 1
-            print(paste0("Testing count: ", testing_count))
+            print(paste0("Testing 2 count: ", testing_count))
             if (testing_count > 180){
               # If it failed too many times then let's try to restart the simulation
               remDr$executeScript(script = 'document.querySelector(".editor-simulate-button").firstElementChild.click()')
@@ -273,12 +273,20 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
             remDrTemp <- remDrList[[ind3]]
             
             testing_status <- NULL
+            testing_count <- 0
             while (is.null(testing_status)){
+              testing_count <- testing_count + 1 
               testing_status <- tryCatch({
                 remDrTemp$findElement(using = "xpath",
                                   value = '//*[@id="alphas-testingStatus"]/div/div[1]/div')$getElementText()[[1]]
               }, error = function(e){
-                Sys.sleep(1)
+                print(paste0("Testing 1 count: ", testing_count))
+                if (testing_count > 180){
+                  # If it failed too many times then let's try to restart the simulation
+                  remDr$executeScript(script = 'document.querySelector(".editor-simulate-button").firstElementChild.click()')
+                  testing_count <- 0
+                }
+                Sys.sleep(2)
               })
             }
             
@@ -325,7 +333,7 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
             score
           },
           error = function(e){
-            
+            print(paste0("NA count: ", na_count))
           }
           )
           Sys.sleep(2)
@@ -352,4 +360,4 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
 }
 
 # Offset defines how many files you want to skip
-funcRun(offset = 0)
+funcRun(offset=1100)

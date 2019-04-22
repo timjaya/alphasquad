@@ -4,7 +4,7 @@ library(plotly)
 
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 parent_dir <- getwd()
-dir_path <- paste0(parent_dir, "/results_combinations")
+dir_path <- paste0(parent_dir, "/results_combinations/")
 result_list <- setdiff(list.files(dir_path),list.dirs(dir_path,recursive=F, full.names = F))
 
 
@@ -29,12 +29,12 @@ ggplotly(my_plot)
 # Get the best sharpe ratio for each strategy
 dt.results[dt.results[, .I[sharpe_ratio == max(sharpe_ratio)], by=strategy]$V1]
 
-dt.results_good <- dt.results[sharpe_ratio > 1.25 & status == "PASS" & score_delta > 0]
+dt.results_good <- dt.results[sharpe_ratio > 1.25 & status == "PASS" & score_delta > 200]
 dt.results_good[order(score_delta, decreasing = TRUE)]
 
 # # Move file back to parent folder
 # for (i in 1:nrow(dt.results_good)){
 #   dt.temp <- dt.results_good[i]
-#   chr.path <- paste0(parent_dir, "/test_combinations/fundamental_estimate_actual_ratio_triple_sum/", dt.temp$alpha_id)
+#   chr.path <- paste0(parent_dir, "/test_combinations/fundamental_ratio_sum_combinations/", dt.temp$alpha_id)
 #   file.copy(chr.path, paste0(parent_dir, "/test_combinations/", dt.temp$alpha_id))
 # }
