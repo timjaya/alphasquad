@@ -14,7 +14,7 @@ url = "https://websim.worldquantvrc.com/simulate"
 
 # for authentication
 # make sure to set environment variables through console e.g. execute
-# Sys.setenv("USERNAME"= "", "PASSWORD"= "")
+# Sys.setenv("USERNAME"= "insert", "PASSWORD"= "insert")
 
 username = Sys.getenv("USERNAME")
 password = Sys.getenv("PASSWORD")
@@ -258,7 +258,7 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
 
             }
             )
-            Sys.sleep(900)
+            Sys.sleep(2)
           }
         } else{
           correlation_value <- NA
@@ -360,4 +360,4 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
 }
 
 # Offset defines how many files you want to skip
-funcRun(offset=1100)
+funcRun(offset=0)

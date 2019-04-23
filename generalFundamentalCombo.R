@@ -430,4 +430,39 @@ funcActualEstimateRatioMultSum <- function(){
   }
 }
 
-
+funcActualEstimateRatioMultDoubleSum <- function(){
+  setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+  parent_dir <- getwd()
+  dir_path_alt <- paste0(parent_dir, "/results_combinations/fundamental_estimate_actual_ratio_mult_sum")
+  result_list <- list.files(dir_path_alt)
+  dt.results <- rbindlist(lapply(result_list, function(x) fread(paste0(dir_path_alt, "/", x))))
+  dt.results[,V1 := NULL]
+  dt.results[,score_delta := as.numeric(score_delta)]
+  dt.results[,sharpe_ratio := as.numeric(sharpe_ratio)]
+  dt.results <- dt.results[status != "ERROR"]
+  
+  setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+  parent_dir <- getwd()
+  dir_path <- paste0(parent_dir, "/test_combinations/fundamental_estimate_actual_ratio_mult_sum")
+  alpha_list <- setdiff(list.files(dir_path),list.dirs(dir_path,recursive=F, full.names = F))
+  alpha_list <- alpha_list[alpha_list %in% dt.results[sharpe_ratio > 1 & score_delta > 700]$alpha_id]
+  
+  dt.write.this <- data.table()
+  
+  for (i in 1:(length(alpha_list) - 1)){
+    for (j in (i+1):(length(alpha_list))){
+      my_code_i <- trimws(readChar(paste0(dir_path, "/", alpha_list[i]), file.info(paste0(dir_path, "/", alpha_list[i]))$size))
+      my_code_j <- trimws(readChar(paste0(dir_path, "/", alpha_list[j]), file.info(paste0(dir_path, "/", alpha_list[j]))$size))
+      dt.append.this <- data.table(code = paste0(my_code_i, "+", my_code_j))
+      dt.write.this <- rbind(dt.write.this, dt.append.this)
+    }
+  }
+  
+  dt.write.this[,id := 1:nrow(dt.write.this)]
+  dt.write.this[,file_name := paste0("alpha_", id)]
+  
+  for (i in 1:nrow(dt.write.this)){
+    dt.temp <- dt.write.this[id == i]
+    writeChar(dt.temp$code, paste0(parent_dir, "/test_combinations/", dt.temp$file, ".txt"), nchars = nchar(dt.temp$code))
+  }
+}
