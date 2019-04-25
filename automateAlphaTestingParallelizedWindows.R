@@ -16,7 +16,7 @@ url = "https://websim.worldquantvrc.com/simulate"
 # make sure to set environment variables through console e.g. execute
 # Sys.setenv("USERNAME"= "insert", "PASSWORD"= "insert")
 
-username = Sys.getenv("USERNAME")
+username = Sys.getenv("jyz2111@columbia.edu")
 password = Sys.getenv("PASSWORD")
 
 authenticate <- function(driver, username, password) {
@@ -89,6 +89,16 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
   alpha_list <- setdiff(list.files(dir_path),list.dirs(dir_path,recursive=F, full.names = F))
   if (offset > 0){
     alpha_list <- tail(alpha_list, -offset)
+  }
+  
+  # If offset is -1. then automatically calculate how much we want to offset
+  if (offset < 0){
+    result_path <- paste0(parent_dir, "/results_combinations/")
+    result_list <- list.files(result_path)
+    result_list <- unlist(strsplit(result_list, "\\."))
+    result_list <- result_list[result_list != "csv"]
+    result_list <- paste0(result_list, ".txt")
+    alpha_list <- setdiff(alpha_list, result_list)
   }
   
   remDrList <- c(remDr1, remDr2, remDr3)
@@ -360,4 +370,4 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
 }
 
 # Offset defines how many files you want to skip
-funcRun(offset=0)
+funcRun(offset=750)
