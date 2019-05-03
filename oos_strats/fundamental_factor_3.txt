@@ -1,1 +1,0 @@
-rank(cashflow_op/cashflow_dividends)

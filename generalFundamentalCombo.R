@@ -216,6 +216,7 @@ funcRatioMultSumGeneration <- function(){
   }
 }
 
+
 ############################################ Includes estimate data ############################################ 
 
 funcEstimatedRatio(){
@@ -466,3 +467,309 @@ funcActualEstimateRatioMultDoubleSum <- function(){
     writeChar(dt.temp$code, paste0(parent_dir, "/test_combinations/", dt.temp$file, ".txt"), nchars = nchar(dt.temp$code))
   }
 }
+
+
+########################################## Both type of data ##################################################
+
+funcRatioForm1 <- function(){
+  # Takes the general form A/(B+C)
+  dt.fundamental <- rbind(fread(paste0(parent_dir, "/alpha_list/estimate_fundamental_factor.csv")),
+                          fread(paste0(parent_dir, "/alpha_list/fundamental_factor.csv")))
+  
+  dt.write.this <- rbindlist(lapply(unique(dt.fundamental$type), function(x){
+    print(x)
+    dt.return.this <- data.table()
+    dt.temp <- dt.fundamental[type == x]
+    for (i in 1:nrow(dt.temp)){
+      for (j in 1:(nrow(dt.temp)-1)){
+        for (k in (j+1):(nrow(dt.temp))){
+          dt.append.this <- data.table(code = paste0("rank(", dt.temp[i]$metric, "/", "(", dt.temp[j]$metric, "+", dt.temp[k]$metric, "))"))
+          dt.return.this <- rbind(dt.return.this, dt.append.this)
+        }
+      }
+    }
+    return (dt.return.this)
+  }))
+  
+  dt.write.this[,id := 1:nrow(dt.write.this)]
+  dt.write.this[,file_name := paste0("alpha_", id)]
+  
+  dt.write.this.sample <- dt.write.this[sample(1:nrow(dt.write.this), 2500, replace = F)]
+  
+  for (i in 1:nrow(dt.write.this.sample)){
+    dt.temp <- dt.write.this.sample[i]
+    writeChar(dt.temp$code, paste0(parent_dir, "/test_combinations/alpha_", i, ".txt"), nchars = nchar(dt.temp$code))
+  }
+}
+
+funcRatioForm2 <- function(){
+  # Takes the general form (a+B)/C
+  # Takes the general form A/(B+)C
+  dt.fundamental <- rbind(fread(paste0(parent_dir, "/alpha_list/estimate_fundamental_factor.csv")),
+                          fread(paste0(parent_dir, "/alpha_list/fundamental_factor.csv")))
+  
+  dt.write.this <- rbindlist(lapply(unique(dt.fundamental$type), function(x){
+    print(x)
+    dt.return.this <- data.table()
+    dt.temp <- dt.fundamental[type == x]
+    for (i in 1:nrow(dt.temp[pos != "denom"])){
+      for (j in 1:(nrow(dt.temp[pos != "denom"])-1)){
+        for (k in 1:(nrow(dt.temp[pos != "num"]))){
+          dt.append.this <- data.table(code = paste0("rank((", dt.temp[i]$metric, "+", dt.temp[j]$metric, ")/", dt.temp[k]$metric, ")"))
+          dt.return.this <- rbind(dt.return.this, dt.append.this)
+        }
+      }
+    }
+    return (dt.return.this)
+  }))
+  
+  dt.write.this[,id := 1:nrow(dt.write.this)]
+  dt.write.this[,file_name := paste0("alpha_", id)]
+  
+  dt.write.this.sample <- dt.write.this[sample(1:nrow(dt.write.this), 5000, replace = F)]
+  
+  for (i in 1:nrow(dt.write.this.sample)){
+    dt.temp <- dt.write.this.sample[i]
+    writeChar(dt.temp$code, paste0(parent_dir, "/test_combinations/alpha_", i+2500, ".txt"), nchars = nchar(dt.temp$code))
+  }
+}
+
+funcRatioForm3 <- function(){
+  # Takes the general form (A+B)/(C+D)
+  dt.fundamental <- rbind(fread(paste0(parent_dir, "/alpha_list/fundamental_factor.csv")))
+  
+  dt.write.this <- rbindlist(lapply(unique(dt.fundamental$type), function(x){
+    print(x)
+    dt.return.this <- data.table()
+    dt.temp <- dt.fundamental[type == x]
+    
+    num_rows <- ceiling(nrow(dt.temp[pos != "denom"])/2)
+    denom_rows <- ceiling(nrow(dt.temp[pos != "num"])/2)
+    
+    for (i in 1:(num_rows-1)){
+      for (j in (i+1):num_rows){
+        for (k in 1:(denom_rows-1)){
+          for (l in (k+1):denom_rows){
+            dt.append.this <- data.table(code = paste0("rank((", dt.temp[i]$metric, "+", dt.temp[j]$metric, ")/(", 
+                                                       dt.temp[k]$metric, "+", dt.temp[l]$metric, "))"))
+            dt.return.this <- rbind(dt.return.this, dt.append.this)
+          }
+        }
+      }
+    }
+    return (dt.return.this)
+  }))
+  
+  dt.write.this[,id := 1:nrow(dt.write.this)]
+  dt.write.this[,file_name := paste0("alpha_", id)]
+  
+  for (i in 1:nrow(dt.write.this)){
+    dt.temp <- dt.write.this[i]
+    writeChar(dt.temp$code, paste0(parent_dir, "/test_combinations/alpha_", i, ".txt"), nchars = nchar(dt.temp$code))
+  }
+}
+
+funcRatioForm3Combo <- function(){
+  setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+  parent_dir <- getwd()
+  dir_path_alt <- paste0(parent_dir, "/results_combinations/form3_fundamental")
+  result_list <- list.files(dir_path_alt)
+  dt.results <- rbindlist(lapply(result_list, function(x) fread(paste0(dir_path_alt, "/", x))))
+  dt.results[,V1 := NULL]
+  dt.results[,score_delta := as.numeric(score_delta)]
+  dt.results[,sharpe_ratio := as.numeric(sharpe_ratio)]
+  dt.results <- dt.results[status != "ERROR"]
+  
+  setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+  parent_dir <- getwd()
+  dir_path <- paste0(parent_dir, "/test_combinations/form3_fundamental")
+  alpha_list <- setdiff(list.files(dir_path),list.dirs(dir_path,recursive=F, full.names = F))
+  alpha_list <- alpha_list[alpha_list %in% dt.results[sharpe_ratio > 0.5 & score_delta > 100 | status == "PASS"]$alpha_id]
+  
+  dt.write.this <- data.table()
+  
+  for (i in 1:(length(alpha_list) - 1)){
+    for (j in (i+1):(length(alpha_list))){
+      my_code_i <- trimws(readChar(paste0(dir_path, "/", alpha_list[i]), file.info(paste0(dir_path, "/", alpha_list[i]))$size))
+      my_code_j <- trimws(readChar(paste0(dir_path, "/", alpha_list[j]), file.info(paste0(dir_path, "/", alpha_list[j]))$size))
+      dt.append.this <- data.table(code = paste0(my_code_i, "+", my_code_j))
+      dt.write.this <- rbind(dt.write.this, dt.append.this)
+    }
+  }
+  
+  dt.write.this[,id := 1:nrow(dt.write.this)]
+  dt.write.this[,file_name := paste0("alpha_", id)]
+  
+  for (i in 1:nrow(dt.write.this)){
+    dt.temp <- dt.write.this[id == i]
+    writeChar(dt.temp$code, paste0(parent_dir, "/test_combinations/", dt.temp$file, ".txt"), nchars = nchar(dt.temp$code))
+  }
+}
+
+funcRatioForm4 <- function(){
+  # Takes the general form (A-B)/(C-D)
+  dt.fundamental <- rbind(fread(paste0(parent_dir, "/alpha_list/fundamental_factor.csv")))
+  
+  dt.write.this <- rbindlist(lapply(unique(dt.fundamental$type), function(x){
+    print(x)
+    dt.return.this <- data.table()
+    dt.temp <- dt.fundamental[type == x]
+    
+    num_rows <- ceiling(nrow(dt.temp[pos != "denom"])/2)
+    denom_rows <- ceiling(nrow(dt.temp[pos != "num"])/2)
+    
+    for (i in 1:(num_rows-1)){
+      for (j in (i+1):num_rows){
+        for (k in 1:(denom_rows-1)){
+          for (l in (k+1):denom_rows){
+            dt.append.this <- data.table(code = paste0("rank((", dt.temp[i]$metric, "-", dt.temp[j]$metric, ")/(", 
+                                                       dt.temp[k]$metric, "-", dt.temp[l]$metric, "))"))
+            dt.return.this <- rbind(dt.return.this, dt.append.this)
+          }
+        }
+      }
+    }
+    return (dt.return.this)
+  }))
+  
+  dt.write.this[,id := 1:nrow(dt.write.this)]
+  dt.write.this[,file_name := paste0("alpha_", id)]
+  
+  for (i in 1:nrow(dt.write.this)){
+    dt.temp <- dt.write.this[i]
+    writeChar(dt.temp$code, paste0(parent_dir, "/test_combinations/alpha_", i, ".txt"), nchars = nchar(dt.temp$code))
+  }
+}
+
+funcRatioForm4Combo <- function(){
+  setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+  parent_dir <- getwd()
+  dir_path_alt <- paste0(parent_dir, "/results_combinations/form4_fundamental")
+  result_list <- list.files(dir_path_alt)
+  dt.results <- rbindlist(lapply(result_list, function(x) fread(paste0(dir_path_alt, "/", x))))
+  dt.results[,V1 := NULL]
+  dt.results[,score_delta := as.numeric(score_delta)]
+  dt.results[,sharpe_ratio := as.numeric(sharpe_ratio)]
+  dt.results <- dt.results[status != "ERROR"]
+  
+  setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+  parent_dir <- getwd()
+  dir_path <- paste0(parent_dir, "/test_combinations/form4_fundamental")
+  alpha_list <- setdiff(list.files(dir_path),list.dirs(dir_path,recursive=F, full.names = F))
+  alpha_list <- alpha_list[alpha_list %in% dt.results[sharpe_ratio > 0.5 & score_delta > 100 | status == "PASS"]$alpha_id]
+  
+  dt.write.this <- data.table()
+  
+  for (i in 1:(length(alpha_list) - 1)){
+    for (j in (i+1):(length(alpha_list))){
+      my_code_i <- trimws(readChar(paste0(dir_path, "/", alpha_list[i]), file.info(paste0(dir_path, "/", alpha_list[i]))$size))
+      my_code_j <- trimws(readChar(paste0(dir_path, "/", alpha_list[j]), file.info(paste0(dir_path, "/", alpha_list[j]))$size))
+      dt.append.this <- data.table(code = paste0(my_code_i, "+", my_code_j))
+      dt.write.this <- rbind(dt.write.this, dt.append.this)
+    }
+  }
+  
+  dt.write.this[,id := 1:nrow(dt.write.this)]
+  dt.write.this[,file_name := paste0("alpha_", id)]
+  
+  for (i in 1:nrow(dt.write.this)){
+    dt.temp <- dt.write.this[id == i]
+    writeChar(dt.temp$code, paste0(parent_dir, "/test_combinations/", dt.temp$file, ".txt"), nchars = nchar(dt.temp$code))
+  }
+}
+
+funcRatioForm5 <- function(){
+  # Takes the general form (A*B)/(C*D)
+  dt.fundamental <- rbind(fread(paste0(parent_dir, "/alpha_list/fundamental_factor.csv")))
+  
+  dt.write.this <- rbindlist(lapply(unique(dt.fundamental$type), function(x){
+    print(x)
+    dt.return.this <- data.table()
+    dt.temp <- dt.fundamental[type == x]
+    
+    num_rows <- ceiling(nrow(dt.temp[pos != "denom"]))
+    denom_rows <- ceiling(nrow(dt.temp[pos != "num"]))
+    
+    for (i in 1:(num_rows-1)){
+      for (j in (i+1):num_rows){
+        for (k in 1:(denom_rows-1)){
+          for (l in (k+1):denom_rows){
+            dt.append.this <- data.table(code = paste0("rank((", dt.temp[i]$metric, "*", dt.temp[j]$metric, ")/(", 
+                                                       dt.temp[k]$metric, "*", dt.temp[l]$metric, "))"))
+            dt.return.this <- rbind(dt.return.this, dt.append.this)
+          }
+        }
+      }
+    }
+    return (dt.return.this)
+  }))
+  
+  dt.write.this <- dt.write.this[sample(1:nrow(dt.write.this), 3000)]
+  dt.write.this[,id := 1:nrow(dt.write.this)]
+  dt.write.this[,file_name := paste0("alpha_", id)]
+  
+  for (i in 1:nrow(dt.write.this)){
+    dt.temp <- dt.write.this[i]
+    writeChar(dt.temp$code, paste0(parent_dir, "/test_combinations/alpha_", i, ".txt"), nchars = nchar(dt.temp$code))
+  }
+}
+
+
+########################################## News data ##################################################
+
+funcInitNewsData <- function(){
+  dt.news <- fread(paste0(parent_dir, "/alpha_list/news_factor.csv"))
+  
+  dt.write.this <- dt.news[,list(code = metric)]
+  dt.write.this[,code := paste0("rank(", code, ")")]
+  dt.write.this[,id := 1:nrow(dt.write.this)]
+  dt.write.this[,file_name := paste0("alpha_", id)]
+  
+  for (i in 1:nrow(dt.write.this)){
+    dt.temp <- dt.write.this[id == i]
+    writeChar(dt.temp$code, paste0(parent_dir, "/test_combinations/alpha_", i, ".txt"), nchars = nchar(dt.temp$code))
+  }
+}
+
+funcInitRatioNewsData <- function(){
+  dt.news <- fread(paste0(parent_dir, "/alpha_list/news_factor.csv"))
+  dt.write.this <- data.table()
+  
+  for (i in 1:(nrow(dt.news)-1)){
+    for(j in (i+1):nrow(dt.news)){
+      dt.write.this <- rbind(dt.write.this, data.table(code = paste0("rank(", dt.news[i]$metric, "/", dt.news[j]$metric, ")")))
+      dt.write.this <- rbind(dt.write.this, data.table(code = paste0("rank(", dt.news[j]$metric, "/", dt.news[i]$metric, ")")))
+    }
+  }
+  dt.write.this[,id := 1:nrow(dt.write.this)]
+  dt.write.this[,file_name := paste0("alpha_", id)]
+  
+  for (i in 1:nrow(dt.write.this)){
+    dt.temp <- dt.write.this[id == i]
+    writeChar(dt.temp$code, paste0(parent_dir, "/test_combinations/", dt.temp$file, ".txt"), nchars = nchar(dt.temp$code))
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

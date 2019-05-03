@@ -16,7 +16,7 @@ url = "https://websim.worldquantvrc.com/simulate"
 # make sure to set environment variables through console e.g. execute
 # Sys.setenv("USERNAME"= "insert", "PASSWORD"= "insert")
 
-username = "jyz2111@columbia.edu"
+username = "nw2408@columbia.edu"
 password = "columbiadsiers2019"
 
 authenticate <- function(driver, username, password) {
@@ -40,7 +40,7 @@ authenticate <- function(driver, username, password) {
   while (is.null(skip_status)){
     skip_status <- tryCatch({
       driver$executeScript(script = 'document.querySelector(".introjs-skipbutton").click()')
-      }, error = function(e){})
+    }, error = function(e){})
     Sys.sleep(1)
   }
   
@@ -63,20 +63,23 @@ authenticateInactive <- function(driver, username, password){
   driver$executeScript(script = 'document.querySelector(".button--lg").firstElementChild.click()')
 }
 
-secondAuthenticate <- function(driver, username, password){
+getErrorMessage <- function(remDrFunc){
+  status <- FALSE
   tryCatch({
-    findElem <- driver$findElement(using = "xpath", value = email_path)
-    authenticate(driver, username, password)
+    error_msg <- remDrFunc$findElement(using = "xpath",
+                                       value = '//*[@id="root"]/div/div[2]/div/div[3]/div[2]/div/div[1]/div/div/div/div[2]/div[2]/div/div/div[1]/ul/li/div')$getElementText()[[1]]
+    status <- TRUE
   }, error=function(e){
     
   })
+  return (status)
 }
 
 funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.corr = FALSE){
   
-  driver1 <- rsDriver(browser=c("chrome"), port = 4444L, chromever="73.0.3683.68")
-  driver2 <- rsDriver(browser=c("chrome"), port = 4445L, chromever="73.0.3683.68")
-  driver3 <- rsDriver(browser=c("chrome"), port = 4446L, chromever="73.0.3683.68")
+  driver1 <- rsDriver(browser=c("chrome"), port = 4450L, chromever="73.0.3683.68")
+  driver2 <- rsDriver(browser=c("chrome"), port = 4451L, chromever="73.0.3683.68")
+  driver3 <- rsDriver(browser=c("chrome"), port = 4452L, chromever="73.0.3683.68")
   
   remDr1 <- driver1[["client"]]
   remDr1$navigate(url)
@@ -100,7 +103,6 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
     alpha_list <- tail(alpha_list, -offset)
   }
   
-  # If offset is -1. then automatically calculate how much we want to offset
   if (offset < 0){
     result_path <- paste0(parent_dir, "/results_combinations/")
     result_list <- list.files(result_path)
@@ -110,11 +112,15 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
     alpha_list <- setdiff(alpha_list, result_list)
   }
   
+  alpha_list <- alpha_list[(ceiling(length(alpha_list)/2)+1):ceiling(length(alpha_list)*0.75)]
+  alpha_list <- alpha_list[!is.na(alpha_list)]
+  
   remDrList <- c(remDr1, remDr2, remDr3)
   
   ind_list <- 1:ceiling(length(alpha_list)/3)
   
   for (ind in ind_list){
+    print(paste0(ind, "/", max(ind_list)))
     vec_alpha <- alpha_list[(3*(ind-1) + 1):(3*ind)] 
     vec_alpha <- vec_alpha[!is.na(vec_alpha)]
     
@@ -183,6 +189,10 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
             remDr$findElement(using = "xpath",
                               value = '//*[@id="alphas-testingStatus"]/div/div[1]/div')$getElementText()[[1]]
           }, error = function(e){
+            errorStatus <- getErrorMessage(remDr)
+            if (errorStatus){
+              remDr$executeScript(script = 'document.querySelector(".editor-simulate-button").firstElementChild.click()')
+            }
             print(paste0("Testing 2 count: ", testing_count))
             if (testing_count > 180){
               # If it failed too many times then let's try to restart the simulation
@@ -227,7 +237,7 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
                                            value = '//*[@id="alphas-testingStatus"]/div/div[2]/div/div/div[1]')$getElementText()[[1]]
             pass_fail_status <- unlist(strsplit(pass_fail, " "))[2]
             pass_fail2 <- remDr$findElement(using = "xpath",
-                                           value = '//*[@id="alphas-testingStatus"]/div/div[2]/div/div/div[2]')$getElementText()[[1]]
+                                            value = '//*[@id="alphas-testingStatus"]/div/div[2]/div/div/div[2]')$getElementText()[[1]]
             pass_fail_status2 <- unlist(strsplit(pass_fail2, " "))[2]
             if (pass_fail_status == "FAIL" | pass_fail_status2 == "FAIL"){
               "FAIL"
@@ -257,10 +267,6 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
         returns <- remDr$findElement(using = "xpath",
                                      value = '//*[@id="alphas-summary"]/div/div[2]/div/div[1]/div/div[5]/div[2]')$getElementText()[[1]]
         
-        # Get Margin
-        margin <- remDr$findElement(using = "xpath",
-                                    value = '//*[@id="alphas-summary"]/div/div[2]/div/div[1]/div/div[6]/div[2]')$getElementText()[[1]]
-        
         # Get correlation
         if (bln.corr){
           # JQuery to run correlation
@@ -269,16 +275,16 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
           Sys.sleep(5)
           correlation_value <- as.numeric(remDr$findElement(using = "xpath",
                                                             value = '//*[@id="alphas-correlation"]/div[2]/div/div[1]/div[2]/div[2]')$getElementText()[[1]])
-
+          
           while (is.null(correlation_value) || is.na(correlation_value)){
             correlation_value <- tryCatch({
               # JQuery to grab correlation value
               # document.getElementsByClassName("correlation__content-status-higher-value")[0].textContent
               value <- as.numeric(remDr$findElement(using = "xpath",
-                                                                value = '//*[@id="alphas-correlation"]/div[2]/div/div[1]/div[2]/div[2]')$getElementText()[[1]])
+                                                    value = '//*[@id="alphas-correlation"]/div[2]/div/div[1]/div[2]/div[2]')$getElementText()[[1]])
             },
             error = function(e){
-
+              
             }
             )
             Sys.sleep(2)
@@ -301,12 +307,16 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
               testing_count <- testing_count + 1 
               testing_status <- tryCatch({
                 remDrTemp$findElement(using = "xpath",
-                                  value = '//*[@id="alphas-testingStatus"]/div/div[1]/div')$getElementText()[[1]]
+                                      value = '//*[@id="alphas-testingStatus"]/div/div[1]/div')$getElementText()[[1]]
               }, error = function(e){
+                errorStatus <- getErrorMessage(remDrTemp)
+                if (errorStatus){
+                  remDrTemp$executeScript(script = 'document.querySelector(".editor-simulate-button").firstElementChild.click()')
+                }
                 print(paste0("Testing 1 count: ", testing_count))
                 if (testing_count > 180){
                   # If it failed too many times then let's try to restart the simulation
-                  remDr$executeScript(script = 'document.querySelector(".editor-simulate-button").firstElementChild.click()')
+                  remDrTemp$executeScript(script = 'document.querySelector(".editor-simulate-button").firstElementChild.click()')
                   testing_count <- 0
                 }
                 Sys.sleep(2)
@@ -331,7 +341,7 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
             }
           }
         }
-
+        
         
         score_delta <- NULL
         na_count <- 0
@@ -368,8 +378,7 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
                                      sharpe_ratio = sharpe_ratio,
                                      turn_over = turn_over,
                                      fitness = fitness,
-                                     returns = returns,
-                                     margin = margin)
+                                     returns = returns)
         
         print(dt.insert.this)
         
@@ -384,4 +393,4 @@ funcRun <- function(offset=0, subtest_folder = "", subresult_folder = "", bln.co
 }
 
 # Offset defines how many files you want to skip
-funcRun(offset=0)
+funcRun(offset=-1)

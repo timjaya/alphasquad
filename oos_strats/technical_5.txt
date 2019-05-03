@@ -1,3 +1,0 @@
-ts_decay_linear(trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>3.5,
-ts_delta(close,5)/ts_stddev(close,252),
-abs(trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>3.5,close,-1)-close)/trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>3.5,close,-1)>0.1),5)

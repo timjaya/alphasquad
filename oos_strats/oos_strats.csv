@@ -1,0 +1,105 @@
+id,type,code
+1,complex,"event=abs(ts_zscore(ts_delay(close,1)-open,20))>2;
+alpha=ts_delta(close,5)/ts_stddev(close,252);
+close_at_event = trade_when(event,close,-1);
+end=abs(close_at_event-close)/close_at_event>0.1;
+
+bar=(open-close)/(high-low);
+a=ts_sum((open>close)*bar,20)/ts_sum((open<close)*(-bar),20);
+b=ts_sum((open>close)*bar,252)/ts_sum((open<close)*(-bar),252);
+
+
+ts_kurtosis(close,20)>ts_kurtosis(close,90)?ts_decay_linear(trade_when(event,alpha,end),5):rank(a/b)
+
+"
+2,complex,"event=abs(ts_zscore(ts_delay(close,1)-open,20))>2;
+alpha=ts_delta(close,5)/ts_stddev(close,252);
+close_at_event = trade_when(event,close,-1);
+end=abs(close_at_event-close)/close_at_event>0.1;
+
+bar=(open-close)/(high-low);
+a=ts_sum((open>close)*bar,20)/ts_sum((open<close)*(-bar),20);
+b=ts_sum((open>close)*bar,252)/ts_sum((open<close)*(-bar),252);
+
+ts_stddev(close,20)>ts_stddev(close,90)?
+ts_decay_linear(trade_when(event,alpha,end),5):rank(a/b)
+
+"
+3,complex,"# VWAP
+delay = ts_delay(close,2);
+regression = ts_regression(close,vwap,90,rettype=3);
+
+# SMA
+ma_60 = ts_sum(close,60)/60;
+
+ts_sum(sign(ts_delta(close,1)),4)==-4?
+rank(delay-regression):close>ma_60?1.6*rank(-ts_delta(close,2)):rank(-ts_delta(close,2))
+"
+4,complex,"# Monthly mean reversion
+event=abs(ts_zscore(ts_delay(close,1)-open,20))>2;
+alpha=ts_delta(close,5)/ts_stddev(close,252);
+close_at_event = trade_when(event,close,-1);
+end=abs(close_at_event-close)/close_at_event>0.1;
+
+ts_stddev(close,20)>ts_stddev(close,90)?
+ts_decay_exp_window(trade_when(event,alpha,end),5):
+-rank(ts_delta(close,2))*(1-rank(ts_decay_linear(volume/sum(volume,30),10)))"
+5,simple,"Group_rank(sales/assets + est_netprofit/cap, subindustry)"
+6,simple,"ts_decay_linear(trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>3.5,
+ts_delta(close,5)/ts_stddev(close,252),
+abs(trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>3.5,close,-1)-close)/trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>3.5,close,-1)>0.1),5)"
+7,complex,"a=-delta(assets_curr - (liabilities_curr - debt_st), 60);b=ts_decay_linear(trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>3.5,
+ts_delta(close,5)/ts_stddev(close,252),
+abs(trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>3.5,close,-1)-close)/trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>3.5,close,-1)>0.1),5);ts_stddev(close,90)>ts_stddev(close,90)?a:b "
+8,complex,"a=ts_decay_linear(trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>2.5,ts_delta(close,5)/ts_stddev(close,252),abs(trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>2.5,close,-1)-close)/trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>2.5,close,-1)>0.1),5);b=Rank(sales/assets);ts_stddev(close,20)>ts_stddev(close,90)?a:b "
+9,complex,"a=ts_decay_linear(trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>2.5,ts_delta(close,5)/ts_stddev(close,252),abs(trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>2.5,close,-1)-close)/trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>2.5,close,-1)>0.1),5);b=-rank(ts_delta(close,2))*(1-rank(ts_decay_linear(volume/sum(volume,30),10)));ts_stddev(close,20)>ts_stddev(close,90)?a:b "
+10,complex,"event=abs(ts_zscore(ts_delay(close,1)-open,20))>1;
+alpha=ts_delta(close,5)/ts_stddev(close,252);
+close_at_event = trade_when(event,close,-1);
+end=abs(close_at_event-close)/close_at_event>0.1;
+
+bar=(open-close)/(high-low);
+a=ts_sum((open>close)*bar,20)/ts_sum((open<close)*(-bar),20);
+b=ts_sum((open>close)*bar,252)/ts_sum((open<close)*(-bar),252);
+
+ts_stddev(close,20)>ts_stddev(close,40)?
+ts_decay_linear(trade_when(event,alpha,end),5):rank(a/b)
+
+"
+11,simple,"ts_decay_linear(trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>3.5,ts_delta(close,5)/ts_stddev(close,152),abs(trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>3.5,close,-1)-close)/trade_when(abs(ts_zscore(ts_delay(close,1)-open,20))>3.5,close,-1)>0.17),6)"
+12,simple,rank(cashflow_op/cashflow_dividends)
+13,simple,rank(cogs/debt_st)
+14,simple,rank(assets/invested_capital)
+15,simple,rank(operating_expense/invested_capital)
+16,simple,rank(cogs/debt_st)+rank(income_tax/income_beforeextra)
+17,simple,rank(assets/invested_capital)+rank(liabilities_curr/goodwill)
+18,simple,rank(rel_num_comp/rel_num_part)+rank(income_beforeextra/income)
+19,simple,rank(revenue/inventory)+rank(ppent/invested_capital)
+20,simple,rank(sales/inventory)+rank(liabilities_curr/invested_capital)
+21,simple,rank(ppent/invested_capital)+rank(SGA_expense/invested_capital)
+22,simple,rank(rel_num_comp/rel_num_part)*rank(liabilities_curr/goodwill)
+23,simple,rank(goodwill/est_cashflow_invst)+rank(EBITDA/est_ebit)
+24,simple,rank(goodwill/est_cashflow_invst)+rank(capex/est_capex)
+25,simple,rank(sales/est_sales)+rank(SGA_expense/est_sga)
+26,simple,rank(revenue/est_sales)+rank(capex/est_capex)
+27,simple,rank(capex/est_capex)+rank(bookvalue_ps/est_cashflow_fin)
+28,simple,rank(SGA_expense/est_sga)+rank(capex/est_ebit)
+29,simple,rank(capex/est_tot_assets)+rank(EBIT/est_cashflow_fin)
+30,simple,rank(est_cashflow_op/cashflow_op)+rank(capex/est_tot_assets)
+31,simple,rank(assets/est_cashflow_fin)+rank(eps/est_ebit)+rank(bookvalue_ps/est_cashflow_fin)
+32,simple,rank(bookvalue_ps/est_cashflow_fin)+rank(capex/est_ebit)+rank(capex/est_tot_assets)
+33,simple,rank(EBIT/est_ebitda)*rank(SGA_expense/est_sga)+rank(sales/est_sales)*rank(cashflow_fin/est_ebitda)
+34,simple,rank(eps/est_cashflow_invst)*rank(goodwill/est_cashflow_invst)+rank(cashflow_op/est_ebit)*rank(EBIT/est_cashflow_op)
+35,simple,rank(eps/est_cashflow_invst)*rank(goodwill/est_cashflow_invst)+rank(sales/est_sales)*rank(revenue/est_sales)
+36,simple,rank(SGA_expense/est_cashflow_invst)*rank(EBIT/est_cashflow_op)+rank(est_cashflow_op/cashflow_op)*rank(sales/est_cashflow_invst)
+37,simple,rank(SGA_expense/est_cashflow_invst)*rank(EBIT/est_cashflow_op)+rank(revenue/est_sales)*rank(cashflow_fin/est_ebitda)
+38,simple,rank(SGA_expense/equity)+rank(income_beforeextra/income)
+39,simple,rank(rel_num_comp/rel_num_part)+rank(SGA_expense/invested_capital)
+40,simple,rank(SGA_expense/equity)+rank(pretax_income/income_beforeextra)
+41,simple,rank((etz_revenue+debt_lt)/income_tax)
+42,simple,rank((cogs+debt_lt)/(debt+debt_st))+rank((capex+cashflow)/(bookvalue_ps+capex))
+43,simple,rank((capex+cashflow)/(bookvalue_ps+capex))+rank((assets_curr+income)/(assets+enterprise_value))
+44,simple,rank((debt_lt+debt_st)/(debt+debt_st))+rank((assets_curr+cogs)/(assets_curr+depre_amort))
+45,simple,"(scale(((sum(close, 7) / 7) - close)) + (20 * scale(ts_corr(vwap, delay(close, 5), 230))))"
+46,simple,-rank(est_grossincome/(interest_expense+revenue))
+47,simple,-rank((est_netdebt+est_netprofit_adj)/operating_expense)

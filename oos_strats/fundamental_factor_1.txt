@@ -1,1 +1,0 @@
-Group_rank(sales/assets + est_netprofit/cap, subindustry)

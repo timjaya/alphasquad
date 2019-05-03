@@ -1,1 +1,0 @@
-rank(SGA_expense/est_cashflow_invst)+rank(goodwill/est_cashflow_invst)

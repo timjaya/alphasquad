@@ -1,4 +1,0 @@
-bar=(open-close)/(high-low);
-a=ts_sum((open>close)*bar,26)/ts_sum((open<close)*(-bar),26);
-b=ts_sum((open>close)*bar,504)/ts_sum((open<close)*(-bar),504);
-rank(a/b)
